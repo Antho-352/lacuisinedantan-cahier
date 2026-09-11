@@ -169,11 +169,16 @@
     .url a { color: inherit; }
     .kicker { font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: #7a4a3a; margin-bottom: 4px; }
     .sheet h1 {
-      font-family: "Great Vibes", cursive;
-      font-size: clamp(36px, 4.4vw, 52px);
+      font-family: "Libre Baskerville", serif;
+      font-size: clamp(26px, 2.6vw, 34px);
       font-weight: 400;
-      line-height: 1;
+      line-height: 1.2;
       margin-bottom: 8px;
+    }
+    .sheet h1.script {
+      font-family: "Great Vibes", cursive;
+      font-size: clamp(40px, 4.6vw, 56px);
+      line-height: 1;
     }
     .lede { font-style: italic; color: var(--muted); margin-bottom: 14px; }
     .photo {
@@ -298,7 +303,7 @@
       return `
         <p class="kicker">Accueil</p>
         <p class="url"><a href="https://lacuisinedantan.fr/que-mettre-a-table/">lacuisinedantan.fr/que-mettre-a-table/</a></p>
-        <h1>Que mettre à table</h1>
+        <h1 class="script">Que mettre à table</h1>
         <p class="lede">Indiquez l’envie et ce que vous avez. L’orientation pointe vers des articles déjà en ligne. Ce n’est pas une recette nouvelle.</p>
         <article>
           <p>Un rôti, un dessert, un geste de cuisson ou un produit du placard : partez d’un besoin concret, puis lisez les articles déjà publiés.</p>
@@ -308,7 +313,7 @@
 
     function postHtml(p) {
       const img = p.img ? `<img class="photo" alt="" src="${p.img}" />` : "";
-      const paras = (p.paras || []).map((t) => `<p>${t}</p>`).join("");
+      const paras = (p.paras || []).filter((t) => t.split("?").length < 6).map((t) => `<p>${t}</p>`).join("");
       return `
         <p class="kicker">${p.cat}</p>
         <p class="url"><a href="https://lacuisinedantan.fr${p.path}">lacuisinedantan.fr${p.path}</a></p>
@@ -341,7 +346,7 @@
         <a href="https://lacuisinedantan.fr/techniques-et-savoir-faire/">Gestes</a>
         <a href="https://lacuisinedantan.fr/produits-et-terroir/">Terroir</a>
         <a href="https://lacuisinedantan.fr/blog/">Cahier</a>
-        ${same.map((p) => `<button type="button" data-go="${p.slug}">${p.title}</button>`).join("")}
+        ${same.map((p) => `<button type="button" data-go="${p.slug}">${p.title.length > 48 ? p.title.slice(0, 46) + "…" : p.title}</button>`).join("")}
       `;
     }
 
