@@ -6,518 +6,365 @@
   <title>La cuisine d’antan — cahier</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=La+Belle+Aurore&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Lora:ital,wght@0,400;0,600;1,400&family=Yeseva+One&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --ink: #241910;
-      --muted: #6a5748;
-      --paper: #f4e6c8;
-      --paper-2: #ead6b0;
-      --cloth: #5a2a26;
-      --gold: #c4a15a;
+      --ink: #2a1810;
+      --muted: #6d4e3a;
+      --cream: #f7edd4;
+      --cream-2: #efe0bc;
+      --rose: #c45c4a;
+      --gold: #e0b35a;
+      --forest: #1e3d36;
+      --page-ink: #3b2418;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { height: 100%; }
     body {
-      font-family: "Libre Baskerville", Georgia, serif;
-      color: var(--ink);
+      font-family: Lora, Georgia, serif;
+      color: var(--page-ink);
       background:
-        radial-gradient(ellipse 80% 50% at 50% 30%, #6a4a32, transparent 55%),
-        #1c1410;
+        radial-gradient(circle at 18% 20%, rgba(224,179,90,.18), transparent 28%),
+        radial-gradient(circle at 88% 80%, rgba(196,92,74,.12), transparent 32%),
+        linear-gradient(180deg, #16352f 0%, #0f2420 55%, #0b1b18 100%);
       overflow: hidden;
     }
-    .table {
+    body::before {
+      content: "";
+      position: fixed; inset: 0; pointer-events: none; opacity: .35;
+      background-image: radial-gradient(#e0b35a 1.1px, transparent 1.2px);
+      background-size: 52px 52px;
+    }
+    .stage {
       min-height: 100%;
       display: grid;
       place-items: center;
-      perspective: 2200px;
-      padding: 24px 12px 64px;
+      padding: 18px 18px 56px;
+      perspective: 1800px;
     }
     .hint {
       position: fixed; left: 0; right: 0; bottom: 0;
-      padding: 12px; text-align: center; color: #d7c4a6;
-      font-size: 12px; letter-spacing: .04em;
-      background: linear-gradient(transparent, rgba(0,0,0,.6));
-      pointer-events: none; z-index: 5;
+      padding: 12px; text-align: center; color: #d7c9a4;
+      font-size: 13px; z-index: 8;
+      background: linear-gradient(transparent, rgba(0,0,0,.55));
+      pointer-events: none;
     }
     .book {
+      width: min(1280px, 96vw);
+      height: min(860px, calc(100vh - 72px));
       position: relative;
-      height: min(620px, 78vh);
       transform-style: preserve-3d;
-      transform: rotateX(8deg) rotateY(-26deg);
-      transition: width 0.9s cubic-bezier(.65,.05,.36,1), transform 0.9s cubic-bezier(.65,.05,.36,1);
-      filter: drop-shadow(0 28px 36px rgba(0,0,0,.55));
-      width: min(420px, 86vw);
+      filter: drop-shadow(0 24px 40px rgba(0,0,0,.45));
     }
-    .book.open {
-      width: min(1040px, 96vw);
-      transform: rotateX(5deg) rotateY(0);
+    .book.closed {
+      width: min(520px, 88vw);
+      height: min(740px, calc(100vh - 72px));
     }
-    .spine {
-      position: absolute; left: 0; top: 0; bottom: 0; width: 34px;
-      background:
-        repeating-linear-gradient(90deg, transparent 0 3px, rgba(0,0,0,.12) 3px 4px),
-        linear-gradient(90deg, #2a1210, #6a3430 45%, #3d1c1a);
-      border-radius: 3px 0 0 3px;
-      box-shadow: inset -8px 0 12px rgba(0,0,0,.35);
-      z-index: 8;
-    }
-    .book.open .spine {
-      left: 50%;
-      width: 22px;
-      margin-left: -11px;
-      border-radius: 2px;
-      box-shadow: inset 0 0 14px rgba(0,0,0,.45);
-    }
-    .edges {
-      position: absolute; top: 8px; bottom: 8px; right: -14px; width: 16px;
-      background: repeating-linear-gradient(
-        180deg,
-        #f3e4c4 0px, #e6d2aa 2px, #cbb892 3px, #f3e4c4 4px
-      );
-      border-radius: 0 2px 2px 0;
-      box-shadow: 2px 0 6px rgba(0,0,0,.25);
-      z-index: 1;
-    }
-    .book.open .edges { right: -10px; width: 12px; }
-    .edges.left {
-      right: auto; left: 28px; display: none;
-    }
-    .book.open .edges.left { display: block; left: -10px; }
+
     .cover {
-      position: absolute; inset: 0 0 0 34px;
-      transform-origin: left center;
-      transform-style: preserve-3d;
-      transition: transform 1.15s cubic-bezier(.65,.02,.3,1);
-      z-index: 9;
-      cursor: pointer;
-    }
-    .book.open .cover {
-      transform: rotateY(-178deg);
-      pointer-events: none;
-      opacity: 0;
-      transition: transform 1.15s cubic-bezier(.65,.02,.3,1), opacity 0.2s 0.85s linear;
-    }
-    .board-left {
-      display: none;
-      position: absolute; left: -10px; top: 0; bottom: 0; width: 18px;
-      background: linear-gradient(90deg, #2a1210, #5a2a26);
-      border-radius: 2px 0 0 2px;
-      z-index: 0;
-    }
-    .book.open .board-left { display: block; }
-    .cover-front, .cover-inside {
       position: absolute; inset: 0;
-      backface-visibility: hidden;
-      border-radius: 0 8px 10px 0;
-    }
-    .cover-front {
-      background:
-        radial-gradient(circle at 20% 18%, rgba(255,255,255,.08), transparent 30%),
-        radial-gradient(circle at 80% 80%, rgba(0,0,0,.35), transparent 40%),
-        linear-gradient(160deg, #6e3532, var(--cloth) 40%, #431c1a);
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      text-align: center; color: #f4e4c4; padding: 12%;
-      box-shadow: inset 0 0 80px rgba(20,8,6,.35);
-    }
-    .cover-front::before {
-      content: ""; position: absolute; inset: 8%;
-      border: 1px solid rgba(196,161,90,.4);
-      pointer-events: none;
-    }
-    .cover-inside {
-      background: linear-gradient(90deg, #3a1a18, #5a2e2a);
-      transform: rotateY(180deg);
-    }
-    .kicker { font-family: "La Belle Aurore", cursive; font-size: 22px; color: var(--gold); margin-bottom: 8px; }
-    .cover h1 {
-      font-family: "Cormorant Garamond", serif; font-weight: 600;
-      font-size: clamp(36px, 7vw, 58px); line-height: .92;
-    }
-    .cover h1 em { display: block; font-size: .5em; font-weight: 500; margin-top: 10px; }
-    .stamp {
-      margin-top: 22px; font-size: 10px; letter-spacing: .28em; text-transform: uppercase;
-      color: var(--gold); border-top: 1px solid rgba(196,161,90,.45); border-bottom: 1px solid rgba(196,161,90,.45); padding: 7px 0;
-    }
-    .open-cta { margin-top: 28px; font-size: 12px; opacity: .8; }
-    .inner {
-      position: absolute; inset: 6px 8px 8px 34px;
-      display: none; transform-style: preserve-3d;
-    }
-    .book.open .inner { display: block; }
-    .leaf {
-      position: absolute; top: 0; bottom: 0; width: 50%;
-      overflow: hidden;
-      background:
-        radial-gradient(circle at 18% 12%, rgba(140,90,40,.1), transparent 32%),
-        linear-gradient(180deg, var(--paper), var(--paper-2));
-    }
-    .leaf.left {
-      left: 0;
-      transform-origin: right center;
-      transform: rotateY(7deg);
-      box-shadow: inset -28px 0 32px rgba(70,40,15,.16);
-      border-radius: 3px 0 0 3px;
-    }
-    .leaf.right {
-      right: 0;
-      transform-origin: left center;
-      transform: rotateY(-7deg);
-      box-shadow: inset 28px 0 32px rgba(70,40,15,.16);
-      border-radius: 0 3px 3px 0;
+      border-radius: 18px 28px 28px 18px;
       cursor: pointer;
-    }
-    .leaf.left::before, .leaf.right::before {
-      content: ""; position: absolute; top: 0; bottom: 0; width: 42px; pointer-events: none;
-    }
-    .leaf.left::before {
-      right: 0;
-      background: linear-gradient(90deg, transparent, rgba(80,40,10,.12) 40%, rgba(40,20,8,.22));
-    }
-    .leaf.right::before {
-      left: 0;
-      background: linear-gradient(90deg, rgba(40,20,8,.22), rgba(80,40,10,.12) 60%, transparent);
-    }
-    .crease {
-      position: absolute; top: 8%; bottom: 8%; width: 1px; background: rgba(80,50,20,.18); pointer-events: none;
-    }
-    .leaf.left .crease { right: 18px; }
-    .leaf.right .crease { left: 18px; }
-    .paper {
-      position: relative; height: 100%;
-      padding: clamp(18px, 3.4vw, 40px) clamp(18px, 3.6vw, 44px) 36px;
       overflow: hidden;
-    }
-    .paper::after {
-      content: ""; position: absolute; inset: 0; pointer-events: none;
       background:
-        radial-gradient(22px 16px at 20% 16%, rgba(130,80,30,.12), transparent 70%),
-        radial-gradient(40px 24px at 82% 86%, rgba(90,50,20,.1), transparent 70%);
-      mix-blend-mode: multiply;
+        radial-gradient(circle at 50% 38%, #2f6a5c, transparent 42%),
+        linear-gradient(160deg, #24574c, #12352f 55%, #0e2a26);
+      border: 6px solid #0c1f1c;
+      box-shadow: inset 0 0 0 8px #c45c4a, inset 0 0 0 14px #0c1f1c;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      text-align: center; color: var(--cream);
+      z-index: 4;
+      transform-origin: left center;
+      transition: transform 1s cubic-bezier(.65,.05,.3,1), opacity .3s .7s;
     }
-    .dog {
-      position: absolute; right: 0; bottom: 0; width: 46px; height: 46px;
-      background: linear-gradient(135deg, transparent 50%, rgba(80,50,20,.18) 50%, #e2cda8);
-      clip-path: polygon(100% 0, 100% 100%, 0 100%);
+    .book:not(.closed) .cover {
+      transform: rotateY(-92deg);
+      opacity: 0;
       pointer-events: none;
     }
-    .leaf.right .dog { display: block; }
-    .leaf.left .dog { display: none; }
-    .running {
-      font-family: "Cormorant Garamond", serif; font-size: 11px;
-      letter-spacing: .16em; text-transform: uppercase; color: var(--muted); margin-bottom: 12px;
+    .medallion {
+      width: min(220px, 46%);
+      aspect-ratio: 1;
+      border-radius: 50%;
+      border: 6px solid var(--gold);
+      background:
+        radial-gradient(circle at 40% 30%, #f7edd4, #e7c98a 46%, #c45c4a 47%, #8a3a2e);
+      display: grid; place-items: center;
+      margin-bottom: 18px;
+      box-shadow: 0 8px 0 #0c1f1c;
     }
-    h2 {
-      font-family: "Cormorant Garamond", serif; font-weight: 600;
-      font-size: clamp(26px, 3vw, 38px); line-height: 1; margin-bottom: 6px;
+    .medallion svg { width: 62%; }
+    .cover .kicker {
+      font-family: Caveat, cursive; font-size: 28px; color: var(--gold); margin-bottom: 4px;
     }
-    .lede { font-style: italic; font-size: 14px; color: #4a382c; margin-bottom: 14px; }
-    .url {
-      font-size: 11px; color: #7a3b32; margin-bottom: 10px; word-break: break-all;
+    .cover h1 {
+      font-family: "Yeseva One", serif;
+      font-size: clamp(40px, 7vw, 64px);
+      line-height: .95;
+      max-width: 10ch;
     }
-    .url a { color: inherit; }
+    .cover h1 em { display: block; font-style: normal; font-size: .42em; margin-top: 10px; letter-spacing: .04em; }
+    .cover .cta { margin-top: 22px; font-family: Caveat, cursive; font-size: 26px; color: var(--cream); }
+
+    .spread {
+      position: absolute; inset: 0;
+      display: grid;
+      grid-template-columns: minmax(280px, 38%) 1fr;
+      background: var(--cream);
+      border-radius: 22px;
+      border: 5px solid #1a120c;
+      overflow: hidden;
+      opacity: 0;
+      pointer-events: none;
+    }
+    .book:not(.closed) .spread { opacity: 1; pointer-events: auto; }
+    .nav, .read {
+      position: relative;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+    }
+    .nav {
+      background:
+        linear-gradient(90deg, transparent 0, transparent calc(100% - 18px), rgba(42,24,16,.08)),
+        repeating-linear-gradient(transparent 0 31px, rgba(196,92,74,.12) 31px 32px),
+        linear-gradient(180deg, #fbf3de, var(--cream-2));
+      border-right: 3px solid #1a120c;
+      padding: 28px 22px 18px 26px;
+    }
+    .read {
+      background:
+        radial-gradient(circle at 90% 10%, rgba(224,179,90,.18), transparent 26%),
+        linear-gradient(180deg, #fff8e8, var(--cream));
+      padding: 0;
+    }
+    .frame {
+      pointer-events: none;
+      position: absolute; inset: 10px;
+      border: 2px solid rgba(42,24,16,.18);
+      border-radius: 8px;
+    }
+    .brand {
+      font-family: Caveat, cursive; font-size: 22px; color: var(--rose); margin-bottom: 2px;
+    }
+    .nav h2 {
+      font-family: "Yeseva One", serif; font-size: 34px; line-height: 1; margin-bottom: 8px;
+    }
+    .nav .lede { font-size: 14px; font-style: italic; color: var(--muted); margin-bottom: 14px; }
+    .toc-wrap { overflow: auto; flex: 1; padding-right: 6px; }
     .chap {
-      font-family: "Cormorant Garamond", serif; font-size: 12px;
-      letter-spacing: .2em; text-transform: uppercase; color: #7a3b32; margin: 12px 0 4px;
+      font-family: "Yeseva One", serif; font-size: 13px; letter-spacing: .14em;
+      text-transform: uppercase; color: var(--rose); margin: 14px 0 6px;
     }
-    .hand { font-family: "La Belle Aurore", cursive; font-size: 20px; color: #6b3a28; margin: 8px 0 4px; }
     .toc { list-style: none; }
-    .toc li {
-      display: grid; grid-template-columns: auto 1fr auto; gap: 8px; align-items: baseline;
-      padding: 4px 0; cursor: pointer; font-size: 13.5px;
+    .toc button {
+      width: 100%; text-align: left; border: 0; background: transparent;
+      font: inherit; color: inherit; cursor: pointer;
+      padding: 7px 10px; border-radius: 8px;
     }
-    .toc li:hover .ttl { text-decoration: underline; text-underline-offset: 3px; }
-    .dots { border-bottom: 1px dotted rgba(36,25,16,.35); transform: translateY(-3px); }
-    .pg { font-variant-numeric: oldstyle-nums; color: var(--muted); font-size: 12px; }
-    .folio { position: absolute; bottom: 12px; font-size: 11px; color: var(--muted); }
-    .left .folio { left: 22px; }
-    .right .folio { right: 22px; }
+    .toc button:hover { background: rgba(196,92,74,.12); }
+    .toc button.is-on {
+      background: #1e3d36; color: var(--cream);
+    }
+    .toc .pg { float: right; opacity: .65; font-size: 12px; }
+    .read-inner {
+      position: relative;
+      height: 100%;
+      overflow: auto;
+      padding: 32px 40px 40px;
+    }
+    .url { font-size: 12px; color: var(--rose); margin-bottom: 8px; }
+    .url a { color: inherit; }
+    .read h1 {
+      font-family: "Yeseva One", serif;
+      font-size: clamp(32px, 4vw, 48px);
+      line-height: 1.05;
+      margin-bottom: 8px;
+    }
+    .kicker-page {
+      font-family: Caveat, cursive; font-size: 24px; color: var(--rose);
+    }
+    .lede-page { font-style: italic; margin-bottom: 16px; color: var(--muted); }
     .photo {
-      width: 100%; height: 54%; object-fit: cover; border: 7px solid #f7eede;
-      box-shadow: 0 8px 16px rgba(50,30,10,.18); filter: sepia(.16) contrast(1.04);
+      width: 100%; max-height: 280px; object-fit: cover;
+      border: 4px solid #1a120c; border-radius: 12px;
+      box-shadow: 6px 6px 0 var(--rose);
+      margin: 8px 0 16px;
     }
-    .cap { margin-top: 8px; font-size: 12px; font-style: italic; color: var(--muted); }
-    article p { font-size: 13.8px; line-height: 1.62; margin-bottom: 10px; }
-    .note { margin-top: 12px; padding-top: 10px; border-top: 1px solid rgba(36,25,16,.18); font-size: 12px; color: var(--muted); }
-    .fly label { display: block; margin: 5px 0; font-size: 14px; cursor: default; }
-    .flipper {
-      position: absolute; top: 0; bottom: 0; width: 50%; right: 0;
-      transform-origin: left center; transform-style: preserve-3d;
-      pointer-events: none; z-index: 20; display: none;
+    article p { font-size: 17px; line-height: 1.65; margin-bottom: 12px; max-width: 62ch; }
+    .note { margin-top: 18px; font-size: 13px; color: var(--muted); }
+    .leaf-turn {
+      position: absolute; inset: 0; transform-origin: left center;
+      background: var(--cream); z-index: 3; pointer-events: none;
+      display: none; overflow: hidden;
     }
-    .flipper.on { display: block; }
-    .flipper.turn {
-      animation: turnFwd 1.15s cubic-bezier(.65,.02,.28,1) forwards;
-    }
-    .flipper.turn-back {
-      animation: turnBack 1.15s cubic-bezier(.65,.02,.28,1) forwards;
-    }
-    .flip-face {
-      position: absolute; inset: 0; backface-visibility: hidden; overflow: hidden;
-      background: var(--paper);
-      box-shadow: 12px 0 40px rgba(0,0,0,.35), -8px 0 24px rgba(0,0,0,.2);
-    }
-    .flip-face.back { transform: rotateY(180deg); }
-    .flip-face .leaf { position: relative; width: 100%; height: 100%; transform: none; box-shadow: none; }
-    @keyframes turnFwd {
-      0% { transform: rotateY(-7deg); }
-      35% { transform: rotateY(-80deg) translateZ(42px); }
-      100% { transform: rotateY(-187deg); }
-    }
-    @keyframes turnBack {
-      0% { transform: rotateY(-187deg); }
-      40% { transform: rotateY(-92deg) translateZ(18px); }
-      100% { transform: rotateY(-7deg); }
+    .leaf-turn.on { display: block; animation: turn 0.85s cubic-bezier(.65,.05,.3,1) forwards; }
+    @keyframes turn {
+      0% { transform: rotateY(0); box-shadow: none; }
+      40% { transform: rotateY(-70deg); box-shadow: -20px 0 40px rgba(0,0,0,.25); }
+      100% { transform: rotateY(-180deg); opacity: .2; }
     }
     @media (prefers-reduced-motion: reduce) {
-      .cover, .book, .flipper { transition: none; animation-duration: .01s !important; }
+      .cover, .leaf-turn { transition: none; animation: none; }
     }
-    @media (max-width: 720px) {
-      .book.open { width: min(520px, 96vw); }
-      .leaf.left, .edges.left { display: none; }
-      .leaf.right, .flipper { width: 100%; transform: none; }
+    @media (max-width: 820px) {
+      .spread { grid-template-columns: 1fr; }
+      .nav { max-height: 36%; border-right: 0; border-bottom: 3px solid #1a120c; }
     }
   </style>
 </head>
 <body>
-  <div class="table">
-    <div class="book" id="book">
-      <div class="spine"></div>
-      <div class="board-left"></div>
-      <div class="edges"></div>
-      <div class="edges left"></div>
+  <div class="stage">
+    <div class="book closed" id="book">
       <div class="cover" id="cover">
-        <div class="cover-front">
-          <p class="kicker">Cahier de maison</p>
-          <h1>La cuisine<br>d’antan<em>recettes, gestes et terroir</em></h1>
-          <p class="stamp">Pour le plat du jour</p>
-          <p class="open-cta">Ouvrir le cahier →</p>
+        <div class="medallion" aria-hidden="true">
+          <svg viewBox="0 0 100 100" fill="none">
+            <ellipse cx="50" cy="62" rx="28" ry="10" fill="#1a120c"/>
+            <path d="M22 58c8-22 48-22 56 0v6H22v-6Z" fill="#c45c4a" stroke="#1a120c" stroke-width="3"/>
+            <path d="M30 58c6-14 34-14 40 0" stroke="#e0b35a" stroke-width="3"/>
+            <circle cx="50" cy="36" r="7" fill="#e0b35a" stroke="#1a120c" stroke-width="3"/>
+          </svg>
         </div>
-        <div class="cover-inside"></div>
+        <p class="kicker">Cahier de maison</p>
+        <h1>La cuisine d’antan<em>recettes · gestes · terroir</em></h1>
+        <p class="cta">Ouvrir le cahier</p>
       </div>
-      <div class="inner">
-        <div class="leaf left" id="pageL"><div class="crease"></div><div class="paper" id="htmlL"></div></div>
-        <div class="leaf right" id="pageR"><div class="crease"></div><div class="dog"></div><div class="paper" id="htmlR"></div></div>
-        <div class="flipper" id="flipper">
-          <div class="flip-face front" id="flipFront"></div>
-          <div class="flip-face back" id="flipBack"></div>
-        </div>
+
+      <div class="spread">
+        <aside class="nav">
+          <div class="frame"></div>
+          <p class="brand">La cuisine d’antan</p>
+          <h2>Sommaire</h2>
+          <p class="lede">Toujours ici. Une ligne, une page déjà publiée.</p>
+          <div class="toc-wrap">
+            <p class="chap">Par où commencer</p>
+            <ul class="toc">
+              <li><button type="button" data-id="table" class="is-on">Que mettre à table <span class="pg">vii</span></button></li>
+            </ul>
+            <p class="chap">I. Recettes</p>
+            <ul class="toc">
+              <li><button type="button" data-id="cake">Cake feta basilic <span class="pg">12</span></button></li>
+            </ul>
+            <p class="chap">II. Gestes</p>
+            <ul class="toc">
+              <li><button type="button" data-id="roti">Rôti de veau <span class="pg">44</span></button></li>
+              <li><button type="button" data-id="madeleine">Bosse des madeleines <span class="pg">49</span></button></li>
+            </ul>
+            <p class="chap">III. Terroir</p>
+            <ul class="toc">
+              <li><button type="button" data-id="confit">Confit de canard <span class="pg">61</span></button></li>
+            </ul>
+          </div>
+        </aside>
+
+        <section class="read">
+          <div class="frame"></div>
+          <div class="leaf-turn" id="turn"></div>
+          <div class="read-inner" id="page"></div>
+        </section>
       </div>
     </div>
   </div>
-  <p class="hint">Cliquez la couverture. Coin bas droit ou bord droit : page suivante. Bord gauche : précédente. Les chemins sont ceux du site live.</p>
+  <p class="hint">Sommaire à gauche, article à droite. Cliquez une ligne — la page de droite tourne. Chrome, pas le navigateur Discord.</p>
 
   <script>
-    const IMG = {
-      roti: "https://www.lacuisinedantan.fr/wp-content/uploads/2026/04/Temps-de-cuisson-roti-de-veau-le-secret-pour-quil-reste-rose-et-juteux.jpg",
-      cake: "https://www.lacuisinedantan.fr/wp-content/uploads/2026/04/Cake-feta-basilic-moelleux-pour-lapero-en-40-minutes.jpg",
-      confit: "https://www.lacuisinedantan.fr/wp-content/uploads/2026/03/Confit-de-canard-du-Sud-Ouest-reconnaitre-la-vraie-qualite-artisanale.jpg",
-      madeleine: "https://www.lacuisinedantan.fr/wp-content/uploads/2026/03/Biscuit-madeleine-de-Cyril-Lignac-la-technique-pour-la-fameuse-bosse.jpg"
-    };
-
-    const spreads = [
-      {
-        left: `
-          <p class="running">La cuisine d’antan</p>
-          <h2>Sommaire</h2>
-          <p class="lede">Le menu du cahier. Une ligne, une page déjà publiée.</p>
-          <p class="hand">Par où commencer</p>
-          <ul class="toc">
-            <li data-go="1"><span class="ttl">Que mettre à table</span><span class="dots"></span><span class="pg">vii</span></li>
-          </ul>
-          <p class="chap">I. Recettes</p>
-          <ul class="toc">
-            <li data-go="2"><span class="ttl">Cake feta basilic, pour l’apéro</span><span class="dots"></span><span class="pg">12</span></li>
-            <li><span class="ttl">Bugnes moelleuses</span><span class="dots"></span><span class="pg">18</span></li>
-            <li><span class="ttl">Blanc de poulet au citron confit</span><span class="dots"></span><span class="pg">24</span></li>
-          </ul>
-          <p class="chap">II. Gestes</p>
-          <ul class="toc">
-            <li data-go="3"><span class="ttl">Temps de cuisson du rôti de veau</span><span class="dots"></span><span class="pg">44</span></li>
-            <li data-go="4"><span class="ttl">La bosse des madeleines</span><span class="dots"></span><span class="pg">49</span></li>
-          </ul>
-          <span class="folio">v</span>`,
-        right: `
-          <p class="running">Sommaire</p>
-          <p class="chap" style="margin-top:36px">III. Terroir</p>
-          <ul class="toc">
-            <li data-go="5"><span class="ttl">Confit de canard du Sud-Ouest</span><span class="dots"></span><span class="pg">61</span></li>
-            <li><span class="ttl">Assiettes Terre de Fer</span><span class="dots"></span><span class="pg">67</span></li>
-            <li><span class="ttl">Bière rouge, noms et caractères</span><span class="dots"></span><span class="pg">72</span></li>
-          </ul>
-          <p class="chap">IV. Le cahier</p>
-          <ul class="toc">
-            <li><span class="ttl">Toutes les pages déjà écrites</span><span class="dots"></span><span class="pg">79</span></li>
-          </ul>
-          <p class="note">Les titres et les adresses sont ceux de lacuisinedantan.fr. On n’invente pas de recette.</p>
-          <span class="folio">vi</span>`
+    const PAGES = {
+      table: {
+        html: `
+          <p class="kicker-page">Pages liminaires</p>
+          <p class="url"><a href="https://lacuisinedantan.fr/que-mettre-a-table/">lacuisinedantan.fr/que-mettre-a-table/</a></p>
+          <h1>Que mettre à table</h1>
+          <p class="lede-page">Indiquez l’envie et ce que vous avez. L’orientation pointe vers des articles déjà en ligne. Ce n’est pas une recette nouvelle.</p>
+          <article>
+            <p>Envie : un plat, un dessert ou un apéro, un geste de cuisson, un produit.</p>
+            <p>Sous la main : viande, légumes, fruits ou laitages, rien de précis.</p>
+            <p>Ce qu’il vous faut : une recette, un temps ou une conversion, reconnaître un produit.</p>
+            <p>Trois pages du cahier, parmi celles déjà publiées — par exemple le rôti de veau, le cake feta basilic, le confit de canard.</p>
+          </article>
+          <p class="note">Le détail se lit dans l’article. Rien n’est inventé ici.</p>`
       },
-      {
-        left: `
-          <p class="running">Pages liminaires</p>
-          <p class="url"><a href="https://lacuisinedantan.fr/que-mettre-a-table/">/que-mettre-a-table/</a></p>
-          <h2>Que mettre à table</h2>
-          <p class="lede">Indiquez l’envie et ce que vous avez. L’orientation pointe vers des articles déjà en ligne.</p>
-          <div class="fly">
-            <p class="hand">Aujourd’hui</p>
-            <label><input type="radio" name="envie" checked disabled /> Un plat</label>
-            <label><input type="radio" name="envie" disabled /> Un dessert ou un apéro</label>
-            <label><input type="radio" name="envie" disabled /> Un geste de cuisson</label>
-            <label><input type="radio" name="main" checked disabled /> Viande sous la main</label>
-            <label><input type="radio" name="besoin" checked disabled /> Un temps ou une conversion</label>
-          </div>
-          <span class="folio">vii</span>`,
-        right: `
-          <p class="running">Que mettre à table</p>
-          <p class="hand">Trois pages du cahier</p>
-          <ul class="toc">
-            <li data-go="3"><span class="ttl">Temps de cuisson du rôti de veau</span><span class="dots"></span><span class="pg">44</span></li>
-            <li data-go="2"><span class="ttl">Cake feta basilic</span><span class="dots"></span><span class="pg">12</span></li>
-            <li data-go="5"><span class="ttl">Confit de canard du Sud-Ouest</span><span class="dots"></span><span class="pg">61</span></li>
-          </ul>
-          <p class="note">Ce n’est pas un diagnostic nutritionnel ni une recette nouvelle.</p>
-          <span class="folio">viii</span>`
-      },
-      {
-        left: `
-          <p class="running">I. Recettes · p. 12</p>
-          <p class="url"><a href="https://lacuisinedantan.fr/cake-feta-basilic/">/cake-feta-basilic/</a></p>
-          <img class="photo" alt="" src="${IMG.cake}" />
-          <p class="cap">Planche du cahier — cake de l’apéro.</p>
-          <span class="folio">12</span>`,
-        right: `
-          <p class="running">Recettes</p>
-          <h2>Cake feta basilic</h2>
-          <p class="lede">Moelleux pour l’apéro en 40 minutes.</p>
+      cake: {
+        html: `
+          <p class="kicker-page">I. Recettes</p>
+          <p class="url"><a href="https://lacuisinedantan.fr/cake-feta-basilic/">lacuisinedantan.fr/cake-feta-basilic/</a></p>
+          <h1>Cake feta basilic</h1>
+          <p class="lede-page">Moelleux pour l’apéro en 40 minutes.</p>
+          <img class="photo" alt="" src="https://www.lacuisinedantan.fr/wp-content/uploads/2026/04/Cake-feta-basilic-moelleux-pour-lapero-en-40-minutes.jpg" />
           <article>
             <p>En bref — Ce cake à la feta et au basilic, pensé pour l’apéro, s’appuie sur des gestes précis et une logique culinaire éprouvée. La pâte est montée comme une émulsion légère, la chaleur est ajustée pour une coagulation régulière des protéines et la répartition de la feta évite l’affaissement.</p>
             <p>On attribue souvent le cake salé à une tradition immémoriale. Les sources domestiques montrent plutôt une solution moderne à la contrainte de cuisson ménagère: un moule unique, un appareil rapide, peu de vaisselle.</p>
-          </article>
-          <span class="folio">13</span>`
+          </article>`
       },
-      {
-        left: `
-          <p class="running">II. Gestes · p. 44</p>
-          <p class="url"><a href="https://lacuisinedantan.fr/temps-cuisson-roti-veau/">/temps-cuisson-roti-veau/</a></p>
-          <img class="photo" alt="" src="${IMG.roti}" />
-          <p class="cap">Planche du cahier — rôti du dimanche.</p>
-          <span class="folio">44</span>`,
-        right: `
-          <p class="running">Gestes</p>
-          <h2>Rôti de veau</h2>
-          <p class="lede">Le secret pour qu’il reste rosé et juteux.</p>
+      roti: {
+        html: `
+          <p class="kicker-page">II. Gestes</p>
+          <p class="url"><a href="https://lacuisinedantan.fr/temps-cuisson-roti-veau/">lacuisinedantan.fr/temps-cuisson-roti-veau/</a></p>
+          <h1>Rôti de veau</h1>
+          <p class="lede-page">Le secret pour qu’il reste rosé et juteux.</p>
+          <img class="photo" alt="" src="https://www.lacuisinedantan.fr/wp-content/uploads/2026/04/Temps-de-cuisson-roti-de-veau-le-secret-pour-quil-reste-rose-et-juteux.jpg" />
           <article>
             <p>On confond souvent durée et justesse. Le poids donne une indication, mais le critère décisif reste la température à cœur. Pour un rôti de veau tendre et rosé, la cible se situe entre 60 et 63°C. Au-delà de 68°C, la coagulation des protéines s’intensifie et la jutosité diminue.</p>
             <p>Compter 20 à 25 minutes par 500 g à 180°C fonctionne bien pour une cuisson rosée, à confirmer au thermomètre. Un rôti d’1 kg cuit ainsi entre 40 et 50 minutes.</p>
-          </article>
-          <span class="folio">45</span>`
+          </article>`
       },
-      {
-        left: `
-          <p class="running">II. Gestes · p. 49</p>
-          <p class="url"><a href="https://lacuisinedantan.fr/madeleine-cyril-lignac-bosse/">/madeleine-cyril-lignac-bosse/</a></p>
-          <img class="photo" alt="" src="${IMG.madeleine}" />
-          <p class="cap">Planche du cahier — la bosse.</p>
-          <span class="folio">49</span>`,
-        right: `
-          <p class="running">Gestes</p>
-          <h2>Madeleines</h2>
-          <p class="lede">La technique pour la fameuse bosse.</p>
+      madeleine: {
+        html: `
+          <p class="kicker-page">II. Gestes</p>
+          <p class="url"><a href="https://lacuisinedantan.fr/madeleine-cyril-lignac-bosse/">lacuisinedantan.fr/madeleine-cyril-lignac-bosse/</a></p>
+          <h1>Madeleines</h1>
+          <p class="lede-page">La technique pour la fameuse bosse.</p>
+          <img class="photo" alt="" src="https://www.lacuisinedantan.fr/wp-content/uploads/2026/03/Biscuit-madeleine-de-Cyril-Lignac-la-technique-pour-la-fameuse-bosse.jpg" />
           <article>
             <p>On associe souvent la bosse à une coquetterie moderne. En réalité, elle s’enracine dans une logique technique née en Lorraine, entre Commercy et Liverdun, lorsque les fours à foyers vifs imposaient des cuissons brèves et franches.</p>
             <p>Question pratique : votre four atteint-il réellement sa température nominale ? Sans chaleur stable, aucune bosse régulière.</p>
-          </article>
-          <span class="folio">50</span>`
+          </article>`
       },
-      {
-        left: `
-          <p class="running">III. Terroir · p. 61</p>
-          <p class="url"><a href="https://lacuisinedantan.fr/confit-canard-sud-ouest/">/confit-canard-sud-ouest/</a></p>
-          <img class="photo" alt="" src="${IMG.confit}" />
-          <p class="cap">Planche du cahier — confit.</p>
-          <span class="folio">61</span>`,
-        right: `
-          <p class="running">Terroir</p>
-          <h2>Confit de canard</h2>
-          <p class="lede">Reconnaître la vraie qualité artisanale.</p>
+      confit: {
+        html: `
+          <p class="kicker-page">III. Terroir</p>
+          <p class="url"><a href="https://lacuisinedantan.fr/confit-canard-sud-ouest/">lacuisinedantan.fr/confit-canard-sud-ouest/</a></p>
+          <h1>Confit de canard</h1>
+          <p class="lede-page">Reconnaître la vraie qualité artisanale.</p>
+          <img class="photo" alt="" src="https://www.lacuisinedantan.fr/wp-content/uploads/2026/03/Confit-de-canard-du-Sud-Ouest-reconnaitre-la-vraie-qualite-artisanale.jpg" />
           <article>
             <p>On croit parfois que le confit serait une fantaisie gourmande récente. C’est inexact : la cuisine de subsistance médiévale du Sud-Ouest a façonné ce procédé par nécessité. Hivers froids, absence de réfrigération et abondance de palmipèdes ont imposé une conservation saisonnière fiable.</p>
             <p>La méthode artisanale repose sur des gestes précis. Salez uniformément, jamais au hasard. Maintenez 80–90 °C : au-delà, la coagulation des protéines durcit la chair.</p>
-          </article>
-          <span class="folio">62</span>`
+          </article>`
       }
-    ];
+    };
 
     const book = document.getElementById("book");
-    const htmlL = document.getElementById("htmlL");
-    const htmlR = document.getElementById("htmlR");
-    const flipper = document.getElementById("flipper");
-    const flipFront = document.getElementById("flipFront");
-    const flipBack = document.getElementById("flipBack");
-    let i = 0, busy = false, opened = false;
+    const page = document.getElementById("page");
+    const turn = document.getElementById("turn");
+    let current = "table";
 
-    function paint(n) {
-      htmlL.innerHTML = spreads[n].left;
-      htmlR.innerHTML = spreads[n].right;
-    }
-    paint(0);
-
-    function openBook() {
-      if (opened) return;
-      opened = true;
-      book.classList.add("open");
-    }
-
-    function leafHtml(side, n) {
-      const crease = '<div class="crease"></div>';
-      const dog = side === "right" ? '<div class="dog"></div>' : "";
-      const html = side === "left" ? spreads[n].left : spreads[n].right;
-      return `<div class="leaf ${side}" style="position:relative;width:100%;height:100%;transform:none;box-shadow:none">${crease}${dog}<div class="paper">${html}</div></div>`;
-    }
-
-    function flipTo(next) {
-      if (!opened || busy || next === i || next < 0 || next >= spreads.length) return;
-      busy = true;
-      const forward = next > i;
-      const dest = next;
-      if (forward) {
-        flipFront.innerHTML = leafHtml("right", i);
-        flipBack.innerHTML = leafHtml("left", dest);
-        htmlR.innerHTML = spreads[dest].right;
-      } else {
-        flipFront.innerHTML = leafHtml("right", dest);
-        flipBack.innerHTML = leafHtml("left", i);
-        htmlL.innerHTML = spreads[dest].left;
-      }
-      flipper.className = "flipper on";
-      void flipper.offsetWidth;
-      flipper.classList.add(forward ? "turn" : "turn-back");
-      const done = () => {
-        paint(dest);
-        flipper.className = "flipper";
-        i = dest;
-        busy = false;
-        flipper.removeEventListener("animationend", done);
+    function show(id, animate) {
+      const next = PAGES[id];
+      if (!next || id === current && page.innerHTML) return;
+      const go = () => {
+        page.innerHTML = next.html;
+        page.scrollTop = 0;
+        current = id;
+        document.querySelectorAll(".toc button").forEach((b) => {
+          b.classList.toggle("is-on", b.dataset.id === id);
+        });
       };
-      flipper.addEventListener("animationend", done);
+      if (!animate) { go(); return; }
+      turn.innerHTML = page.innerHTML;
+      turn.className = "leaf-turn on";
+      go();
+      const done = () => { turn.className = "leaf-turn"; turn.removeEventListener("animationend", done); };
+      turn.addEventListener("animationend", done);
     }
 
-    document.getElementById("cover").addEventListener("click", openBook);
-
-    document.getElementById("pageR").addEventListener("click", (e) => {
-      if (e.target.closest("[data-go]")) return;
-      flipTo(i + 1);
+    document.getElementById("cover").addEventListener("click", () => {
+      book.classList.remove("closed");
+      show("table", false);
     });
-    document.getElementById("pageL").addEventListener("click", (e) => {
-      if (e.target.closest("[data-go]")) return;
-      const rect = e.currentTarget.getBoundingClientRect();
-      if (e.clientX - rect.left < rect.width * 0.28) flipTo(i - 1);
-    });
-    book.addEventListener("click", (e) => {
-      const go = e.target.closest("[data-go]");
-      if (!go) return;
-      e.stopPropagation();
-      flipTo(Number(go.getAttribute("data-go")));
+    document.querySelector(".toc-wrap").addEventListener("click", (e) => {
+      const btn = e.target.closest("button[data-id]");
+      if (!btn) return;
+      show(btn.dataset.id, true);
     });
   </script>
 </body>
